@@ -9,7 +9,7 @@ favoritesRouter.use(bodyParser.json());
 favoritesRouter.route('/')
   .get((req, res, next) => {
     Favorites.find({})
-      .populate('author')
+      .populate('user')
       .populate('dishes')
       .then((favorites) => {
         res.statusCode = 200;
@@ -19,7 +19,7 @@ favoritesRouter.route('/')
       .catch((err) => next(err));
   })
   .post(authenticate.verifyUser, (req, res, next) => {
-    Favorites.findOne({ author: req.user.id }, (err, favorites) => {
+    Favorites.findOne({ user: req.user.id }, (err, favorites) => {
       if (err) {
         return next(err)
       }
@@ -36,7 +36,7 @@ favoritesRouter.route('/')
       }
       else {
         Favorites.create({
-          author: req.user.id,
+          user: req.user.id,
           dishes: req.body.favoriteDishIds
         })
           .then((favorites) => {
@@ -54,7 +54,7 @@ favoritesRouter.route('/')
     res.end('PUT operation not supported on /favorites');
   })
   .delete(authenticate.verifyUser, (req, res, next) => {
-    Favorites.findOneAndRemove({ author: req.user.id })
+    Favorites.findOneAndRemove({ user: req.user.id })
       .then((resp) => {
         res.statusCode = 200;
         res.setHeader('Content-Type', 'application/json');
@@ -69,7 +69,7 @@ favoritesRouter.route('/:dishId')
     res.end('GET operation not supported on /favorites/dishId');
   })
   .post(authenticate.verifyUser, (req, res, next) => {
-    Favorites.findOne({ author: req.user.id }, (err, favorites) => {
+    Favorites.findOne({ user: req.user.id }, (err, favorites) => {
       if (err) {
         return next(err);
       }
@@ -86,7 +86,7 @@ favoritesRouter.route('/:dishId')
       }
       else {
         Favorites.create({
-          author: req.user.id,
+          user: req.user.id,
           dishes: [req.params.dishId]
         })
           .then((favorites) => {
@@ -103,7 +103,7 @@ favoritesRouter.route('/:dishId')
     res.end('PUT operation not supported on /favorites');
   })
   .delete(authenticate.verifyUser, (req, res, next) => {
-    Favorites.findOne({ author: req.user.id })
+    Favorites.findOne({ user: req.user.id })
       .populate('dishes')
       .then((favorites) => {
         if (favorites) {
